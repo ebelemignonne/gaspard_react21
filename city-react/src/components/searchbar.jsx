@@ -2,11 +2,15 @@ import * as React from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import SearchIcon from "@mui/icons-material/Search";
 
-export default function Searchbar() {
+export default function Searchbar({ setSearchTerm, handleSearchTerm }) {
+  const handleChange = () => {
+    let value = document.getElementById("search").value;
+    setSearchTerm(value);
+  };
+
   return (
     <div className="searchbox">
       <Box
@@ -18,13 +22,18 @@ export default function Searchbar() {
         autoComplete="off"
       >
         <TextField
-          id="outlined-basic"
+          id="search"
           label="Que recherchez-vous?"
+          onChange={handleChange}
           variant="outlined"
         />
       </Box>
       <Stack direction="row" spacing={1}>
-        <Button variant="contained" endIcon={<SearchIcon />}>
+        <Button
+          variant="contained"
+          endIcon={<SearchIcon />}
+          onClick={handleSearchTerm}
+        >
           Rechercher
         </Button>
       </Stack>

@@ -12,31 +12,82 @@ import Typography from "@mui/material/Typography";
 import axios from "axios";
 import React, { useState, useEffect } from "react";
 
-export default function Chaussures() {
-  const [chaussures, setChaussures] = useState([]);
+export default function Chaussures({ chaussures, setChaussures }) {
+  const [allShoes, setallShoes] = useState([]);
 
   useEffect(() => {
     getChaussures();
-  }, []);
+  });
 
   const getChaussures = async () => {
-    const response = await axios.get("http://localhost:3000/api/chaussures");
-    setChaussures(response.data);
+    var response = await axios.get("http://localhost:3200/api/chaussures");
+    setallShoes(response.data);
   };
 
-  const [Pointure, setPointure] = React.useState("");
+  const [Pointures, setPointures] = React.useState(0);
+
+  const [Sizes, setSizes] = React.useState([]);
+  useEffect(() => {
+    getSizes();
+  }, []);
+
+  const getSizes = async () => {
+    var response = await axios.get(
+      "http://localhost:3001/api/pointure/chaussures"
+    );
+    setSizes(response.data);
+  };
+
+  const [Brands, setBrands] = React.useState([]);
+  useEffect(() => {
+    getBrands();
+  }, []);
+
+  const getBrands = async () => {
+    var response = await axios.get("http://localhost:3001/api/marques");
+    setBrands(response.data);
+  };
 
   const handleChangePointures = (event) => {
-    setPointure(event.target.value);
+    setPointures(event.target.value);
   };
-  const [Marques, setMarques] = React.useState("");
+
+  const [Marques, setMarques] = React.useState(0);
 
   const handleChangeMarques = (event) => {
     setMarques(event.target.value);
   };
 
+  const filteredBrand = () => {
+    if (Marques !== 0) {
+      if (Pointures === 0) {
+        var filteredData = allShoes.filter(
+          (chaussure) => chaussure.id_marque === Marques
+        );
+        setChaussures(filteredData);
+      } else {
+        var filtereddata = allShoes.filter(
+          (chaussure) => chaussure.id_marque === Marques
+        );
+        var filteredShoes = filtereddata.filter(
+          (chaussure) => chaussure.pointure === Pointures
+        );
+        setChaussures(filteredShoes);
+      }
+    } else {
+      if (Pointures !== 0) {
+        var filteredshoes = allShoes.filter(
+          (chaussure) => chaussure.pointure === Pointures
+        );
+        setChaussures(filteredshoes);
+      } else {
+        setChaussures(allShoes);
+      }
+    }
+  };
+
   return (
-    <div className="chaussuresBox">
+    <div className="chaussuresBox" id="shoes">
       <div className="Selects">
         <Box sx={{ minWidth: 120, marginRight: 3, width: 200 }}>
           <FormControl fullWidth>
@@ -44,14 +95,22 @@ export default function Chaussures() {
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
-              value={Pointure}
+              value={Pointures}
               label="Age"
               onChange={handleChangePointures}
             >
-              <MenuItem value={10}>Toutes</MenuItem>
+              <MenuItem value={0}>Toutes</MenuItem>
+              {Sizes.map((item) => {
+                return (
+                  <MenuItem key={item.pointure} value={item.pointure}>
+                    {item.pointure}
+                  </MenuItem>
+                );
+              })}
             </Select>
           </FormControl>
         </Box>
+
         <Box sx={{ minWidth: 120, marginRight: 3, width: 200 }}>
           <FormControl fullWidth>
             <InputLabel id="demo-simple-select-label">Marques</InputLabel>
@@ -62,35 +121,48 @@ export default function Chaussures() {
               label="Age"
               onChange={handleChangeMarques}
             >
-              <MenuItem value={10}>Toutes</MenuItem>
+              <MenuItem value={0}>Toutes</MenuItem>
+              {Brands.map((item) => {
+                return (
+                  <MenuItem key={item.marque} value={item.id_marque}>
+                    {item.marque}
+                  </MenuItem>
+                );
+              })}
             </Select>
           </FormControl>
         </Box>
+        <Button size="small" onClick={filteredBrand}>
+          {" "}
+          Filtrer
+        </Button>
       </div>
 
       <div className="Chaussures">
-        {chaussures.map((chaussure, index) => {
+        {chaussures.map((chaussure) => {
           return (
             <Card
               sx={{ width: 280, marginBottom: 5 }}
-              key={chaussure.id_Chaussures}
+              key={chaussure.nom_chaussure}
             >
               <CardMedia
                 component="img"
                 height="140"
                 image={chaussure.images}
-                alt="image"
+                alt="Chaussure"
               />
               <CardContent>
                 <Typography gutterBottom variant="h5" component="div">
                   {chaussure.nom_chaussure}
                 </Typography>
-                <Typography variant="h7" color="text.secondary">
-                  {chaussure.prix}FCFA
+                <Typography variant="body2" color="text.secondary">
+                  Couleur:{chaussure.couleur} - Pointure:{chaussure.pointure}
                 </Typography>
+                <br></br>
+                <Typography variant="h6">{chaussure.prix}FCFA</Typography>
               </CardContent>
               <CardActions>
-                <Button size="small">Acheter</Button>
+                <Button size="small"> Acheter</Button>
                 <Button size="small">Ajouter au panier</Button>
               </CardActions>
             </Card>
