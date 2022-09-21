@@ -33,7 +33,7 @@ export default function Chaussures({ chaussures, setChaussures }) {
 
   const getSizes = async () => {
     var response = await axios.get(
-      "http://localhost:3001/api/pointure/chaussures"
+      "http://localhost:3200/api/pointure/chaussures"
     );
     setSizes(response.data);
   };
@@ -44,7 +44,7 @@ export default function Chaussures({ chaussures, setChaussures }) {
   }, []);
 
   const getBrands = async () => {
-    var response = await axios.get("http://localhost:3001/api/marques");
+    var response = await axios.get("http://localhost:3200/api/marques");
     setBrands(response.data);
   };
 
